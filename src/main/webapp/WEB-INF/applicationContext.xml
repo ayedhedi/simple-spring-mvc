@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/security
+       http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <bean id="csrfFilter" class="org.springframework.security.web.csrf.CsrfFilter">
+        <constructor-arg>
+            <bean class="org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository"/>
+        </constructor-arg>
+    </bean>
+    <!--
+        Provides automatic CSRF token inclusion when using Spring MVC Form tags or Thymeleaf. See
+        http://localhost:8080/#forms and form.jsp for examples
+    -->
+    <bean id="requestDataValueProcessor" class="org.springframework.security.web.servlet.support.csrf.CsrfRequestDataValueProcessor"/>
+
+    <security:http auto-config='true'>
+        <security:intercept-url pattern="/secured/*" access="isAuthenticated()" />
+        <security:form-login login-processing-url="/j_spring_security_check" login-page="/login"
+                    default-target-url="/secured/hello.mvc" authentication-failure-url="/login?error"
+                    username-parameter="username" password-parameter="password" />
+    </security:http>
+
+    <security:authentication-manager>
+        <security:authentication-provider>
+            <security:user-service>
+                <security:user name="test" password="test" authorities="ROLE_USER" />
+            </security:user-service>
+        </security:authentication-provider>
+    </security:authentication-manager>
+
+</beans>
